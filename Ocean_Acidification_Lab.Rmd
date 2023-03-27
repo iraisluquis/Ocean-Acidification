@@ -1,0 +1,77 @@
+---
+title: "Ocean_Acidification_Lab"
+author: "Irais Luquis Ramos"
+date: "2023-03-23"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+---
+
+Can we quantify ocean acidification in the subtropical North Atlantic Ocean?
+  
+  1) Is surface ocean pco2 increasing
+  2) Is surface ocean seawater ph decreasing? 
+  3) Is surface ocean seawater saturation state with respect to aragonite           decreasing? 
+  
+Load Required library
+```{r, message=FALSE}
+library(tidyverse)
+library(reader)
+library(gsw)
+library('seacarb')
+```
+BATS Bottle Import Data
+```{r, message=FALSE, warning=FALSE}
+bats_bottle <- read_delim("bats_bottle.txt", 
+                          delim = "\t", escape_double = FALSE, 
+                          col_names = FALSE, trim_ws = TRUE, skip = 60)
+
+bats_bottle <- read_csv("bats_bottle.txt", 
+                        skip = 59)
+
+colnames(bats_bottle)<- colnames(read_csv("bats_bottle.txt", 
+                                          skip = 59))
+```
+
+We are using BATS DATA 
+
+Variables and Units 
+
+yyyymmdd = Year Month Day   
+decy   = Decimal Year     
+time   = Time (hhmm)      
+latN   = Latitude (Deg N) 
+lonW   = Longitude (Deg W)
+Depth  = Depth (m)                  
+Temp   = Temperature ITS-90 (C)    
+CTD_S  = CTD Salinity (PSS-78)      
+Sal1   = Salinity-1 (PSS-78)        
+Sig-th = Sigma-Theta (kg/m^3)       
+O2(1)  = Oxygen-1 (umol/kg)          
+OxFixT = Oxygen Fix Temp (C)        
+Anom1  = Oxy Anomaly-1 (umol/kg)    
+CO2    = dissolved inorganic carbon (umol/kg)              
+Alk    = Alkalinity (uequiv)        
+NO31   = Nitrate+Nitrite-1 (umol/kg)
+NO21   = Nitrite-1 (umol/kg)        
+PO41   = Phosphate-1 (umol/kg)      
+Si1    = Silicate-1 (umol/kg)       
+POC    = POC (ug/kg)                
+PON    = PON (ug/kg)                
+TOC    = TOC (umol/kg)                
+TN     = TN (umol/kg)  
+Bact   = Bacteria enumeration (cells*10^8/kg)   
+POP    = POP (umol/kg)
+TDP    = Total dissolved Phosphorus (nmol/kg)
+SRP    = Low-level phosphorus (nmol/kg)
+BSi    = Particulate biogenic silica (umol/kg)
+LSi    = Particulate lithogenic silica  (umol/kg)
+Pro    = Prochlorococcus (cells/ml)
+Syn    = Synechococcus (cells/ml)
+Piceu  = Picoeukaryotes (cells/ml)
+Naneu  = Nanoeukaryotes (cells/ml)
+
+  Quality flags
+  
+-999 = Missing or bad data
+0 = Less than detection limit
