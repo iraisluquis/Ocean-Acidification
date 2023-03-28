@@ -75,3 +75,7 @@ Naneu  = Nanoeukaryotes (cells/ml)
   
 -999 = Missing or bad data
 0 = Less than detection limit
+
+##Intro on BATS and ocean acidification
+
+Here we will be using The Gibbs SeaWater (GSW) Oceanographic Toolbox of TEOS-10 to helps us quantify ocean acidification over the past 40 years in the subtropical North Atlantic Ocean using BATS Time-series records. This with the intend to find different ways to predict changes going further into the future to help us understand what to expect in the future and analyze how this will affect the oceanic ecosystem. 
