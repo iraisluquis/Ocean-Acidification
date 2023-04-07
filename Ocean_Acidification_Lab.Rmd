@@ -1,5 +1,5 @@
 ---
-title: "Ocean_Acidification_Lab"
+title: "Ocean Acidification Lab"
 author: "Irais Luquis Ramos"
 date: "2023-03-23"
 output: 
@@ -13,14 +13,15 @@ Can we quantify ocean acidification in the subtropical North Atlantic Ocean?
   2) Is surface ocean seawater ph decreasing? 
   3) Is surface ocean seawater saturation state with respect to aragonite           decreasing? 
   
-Load Required library
+**Load Required library**
 ```{r, message=FALSE}
 library(tidyverse)
 library(reader)
 library(gsw)
 library('seacarb')
+library(performance)
 ```
-BATS Bottle Import Data
+**BATS Bottle Import Data**
 ```{r, message=FALSE, warning=FALSE}
 bats_bottle <- read_delim("bats_bottle.txt", 
                           delim = "\t", escape_double = FALSE, 
@@ -33,49 +34,102 @@ colnames(bats_bottle)<- colnames(read_csv("bats_bottle.txt",
                                           skip = 59))
 ```
 
-We are using BATS DATA 
+**Variables and Units**
 
-Variables and Units 
+- yyyymmdd = Year Month Day   
+- decy   = Decimal Year     
+- time   = Time (hhmm)      
+- latN   = Latitude (Deg N) 
+- lonW   = Longitude (Deg W)
+- Depth  = Depth (m)                  
+- Temp   = Temperature ITS-90 (C)    
+- CTD_S  = CTD Salinity (PSS-78)      
+- Sal1   = Salinity-1 (PSS-78)        
+- Sig-th = Sigma-Theta (kg/m^3)       
+- O2(1)  = Oxygen-1 (umol/kg)          
+- OxFixT = Oxygen Fix Temp (C)        
+- Anom1  = Oxy Anomaly-1 (umol/kg)    
+- CO2    = dissolved inorganic carbon (umol/kg)              
+- Alk    = Alkalinity (uequiv)        
+- NO31   = Nitrate+Nitrite-1 (umol/kg)
+- NO21   = Nitrite-1 (umol/kg)        
+- PO41   = Phosphate-1 (umol/kg)      
+- Si1    = Silicate-1 (umol/kg)       
+- POC    = POC (ug/kg)                
+- PON    = PON (ug/kg)                
+- TOC    = TOC (umol/kg)                
+- TN     = TN (umol/kg)  
+- Bact   = Bacteria enumeration (cells*10^8/kg)   
+- POP    = POP (umol/kg)
+- TDP    = Total dissolved Phosphorus (nmol/kg)
+- SRP    = Low-level phosphorus (nmol/kg)
+- BSi    = Particulate biogenic silica (umol/kg)
+- LSi    = Particulate lithogenic silica  (umol/kg)
+- Pro    = Prochlorococcus (cells/ml)
+- Syn    = Synechococcus (cells/ml)
+- Piceu  = Picoeukaryotes (cells/ml)
+- Naneu  = Nanoeukaryotes (cells/ml)
 
-yyyymmdd = Year Month Day   
-decy   = Decimal Year     
-time   = Time (hhmm)      
-latN   = Latitude (Deg N) 
-lonW   = Longitude (Deg W)
-Depth  = Depth (m)                  
-Temp   = Temperature ITS-90 (C)    
-CTD_S  = CTD Salinity (PSS-78)      
-Sal1   = Salinity-1 (PSS-78)        
-Sig-th = Sigma-Theta (kg/m^3)       
-O2(1)  = Oxygen-1 (umol/kg)          
-OxFixT = Oxygen Fix Temp (C)        
-Anom1  = Oxy Anomaly-1 (umol/kg)    
-CO2    = dissolved inorganic carbon (umol/kg)              
-Alk    = Alkalinity (uequiv)        
-NO31   = Nitrate+Nitrite-1 (umol/kg)
-NO21   = Nitrite-1 (umol/kg)        
-PO41   = Phosphate-1 (umol/kg)      
-Si1    = Silicate-1 (umol/kg)       
-POC    = POC (ug/kg)                
-PON    = PON (ug/kg)                
-TOC    = TOC (umol/kg)                
-TN     = TN (umol/kg)  
-Bact   = Bacteria enumeration (cells*10^8/kg)   
-POP    = POP (umol/kg)
-TDP    = Total dissolved Phosphorus (nmol/kg)
-SRP    = Low-level phosphorus (nmol/kg)
-BSi    = Particulate biogenic silica (umol/kg)
-LSi    = Particulate lithogenic silica  (umol/kg)
-Pro    = Prochlorococcus (cells/ml)
-Syn    = Synechococcus (cells/ml)
-Piceu  = Picoeukaryotes (cells/ml)
-Naneu  = Nanoeukaryotes (cells/ml)
-
-  Quality flags
+**Quality flags**
   
--999 = Missing or bad data
-0 = Less than detection limit
+- -999 = Missing or bad data
+- 0 = Less than detection limit
 
-##Intro on BATS and ocean acidification
+**Intro on BATS and ocean acidification**
 
 Here we will be using The Gibbs SeaWater (GSW) Oceanographic Toolbox of TEOS-10 to helps us quantify ocean acidification over the past 40 years in the subtropical North Atlantic Ocean using BATS Time-series records. This with the intend to find different ways to predict changes going further into the future to help us understand what to expect in the future and analyze how this will affect the oceanic ecosystem. 
+
+Ocean acidification due to climate change is changing the carbon cycle in the ocean. Trying to understand the metabolic processes on the ocean ecosystem and the variability between net ecosystem production and net ecosystem calcification...   (expand on ocean acidification with references?)
+
+**Questions:**
+
+1) Is surface ocean pco2 increasing
+
+**Calculate CO2 chemistry parameter**
+
+We need to use the formula from ?carb;
+
+- carb(flag, var1, var2, S=35, T=25, Patm=1, P=0, Pt=0, Sit=0,
+    k1k2="x", kf="x", ks="d", pHscale="T", b="u74", gas="potential", 
+    warn="y", eos="eos80", long=1.e20, lat=1.e20)
+
+Using the data we have TA, DIC (CO2), S, T, Pt, Sit, but we don't have pressure (dbar)
+
+Firts we need to calculate pressure using TEOS-10 with ?gsw and the formula 
+p = gsw_p_from_z(z,lat)
+```{r}
+bats_co2=bats_bottle %>%
+  mutate(P_dbar=gsw_p_from_z(Depth*-1,latN))
+
+#We used -1 cause is negative in the ocean
+
+```
+
+We now have all of the variables that we need to calculate the surface seawater chemistry at the BATS station, but we need to be careful about using the same units as the parameter of the seawater carbonate system. 
+
+Now that we have TA, DIC, S, T, Pt, Sit, Pressure we need our BATS data units to be the same as the units used in the CO2sys. 
+
+- TA is in uequiv = umol/kg and we need mol/kg
+  - Alk*10^-6
+
+- DIC is in umol/ kg and we need mol/kg
+  - DIC*10^-6
+
+- S is in PSS and we will use Eos80
+  - Sal1
+
+- T is in degrees C and we need degree C
+  - Temp
+
+- Pt is in umol/kg and we need mol/kg
+  - PO41*10^-6
+
+- Sit is in umol/kg an we need mol/kg
+  - Si1*10^-6
+
+- P_dbar is in dbar and we need bar 
+  - P_dbar/10 or P_dbar*10^-1
+  
+We will need to convert Units scaling when using CO2sys. We copy the code from ?carb. Since we have we have TA y DIC we should use flag = 15 ALK and DIC. 
+
+**Units scaling for CO2sys**

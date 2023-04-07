@@ -14,7 +14,7 @@
 
 <meta name="date" content="2023-03-23" />
 
-<title>Ocean_Acidification_Lab</title>
+<title>Ocean Acidification Lab</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -139,7 +139,7 @@ pointer-events: auto;
 
 
 <section class="page-header">
-<h1 class="title toc-ignore project-name">Ocean_Acidification_Lab</h1>
+<h1 class="title toc-ignore project-name">Ocean Acidification Lab</h1>
 <h4 class="author project-author">Irais Luquis Ramos</h4>
 <h4 class="date project-date">2023-03-23</h4>
 </section>
@@ -155,12 +155,13 @@ Ocean?</p>
 <li>Is surface ocean seawater saturation state with respect to aragonite
 decreasing?</li>
 </ol>
-<p>Load Required library</p>
+<p><strong>Load Required library</strong></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reader)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gsw)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;seacarb&#39;</span>)</span></code></pre></div>
-<p>BATS Bottle Import Data</p>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;seacarb&#39;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)</span></code></pre></div>
+<p><strong>BATS Bottle Import Data</strong></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>bats_bottle <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;bats_bottle.txt&quot;</span>, </span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>, <span class="at">escape_double =</span> <span class="cn">FALSE</span>, </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">col_names =</span> <span class="cn">FALSE</span>, <span class="at">trim_ws =</span> <span class="cn">TRUE</span>, <span class="at">skip =</span> <span class="dv">60</span>)</span>
@@ -170,43 +171,139 @@ decreasing?</li>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bats_bottle)<span class="ot">&lt;-</span> <span class="fu">colnames</span>(<span class="fu">read_csv</span>(<span class="st">&quot;bats_bottle.txt&quot;</span>, </span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">skip =</span> <span class="dv">59</span>))</span></code></pre></div>
-<p>We are using BATS DATA</p>
-<p>Variables and Units</p>
-<p>yyyymmdd = Year Month Day<br />
-decy = Decimal Year<br />
-time = Time (hhmm)<br />
-latN = Latitude (Deg N) lonW = Longitude (Deg W) Depth = Depth (m)<br />
-Temp = Temperature ITS-90 (C)<br />
-CTD_S = CTD Salinity (PSS-78)<br />
-Sal1 = Salinity-1 (PSS-78)<br />
-Sig-th = Sigma-Theta (kg/m^3)<br />
-O2(1) = Oxygen-1 (umol/kg)<br />
-OxFixT = Oxygen Fix Temp (C)<br />
-Anom1 = Oxy Anomaly-1 (umol/kg)<br />
-CO2 = dissolved inorganic carbon (umol/kg)<br />
-Alk = Alkalinity (uequiv)<br />
-NO31 = Nitrate+Nitrite-1 (umol/kg) NO21 = Nitrite-1 (umol/kg)<br />
-PO41 = Phosphate-1 (umol/kg)<br />
-Si1 = Silicate-1 (umol/kg)<br />
-POC = POC (ug/kg)<br />
-PON = PON (ug/kg)<br />
-TOC = TOC (umol/kg)<br />
-TN = TN (umol/kg)<br />
-Bact = Bacteria enumeration (cells*10^8/kg)<br />
-POP = POP (umol/kg) TDP = Total dissolved Phosphorus (nmol/kg) SRP =
-Low-level phosphorus (nmol/kg) BSi = Particulate biogenic silica
-(umol/kg) LSi = Particulate lithogenic silica (umol/kg) Pro =
-Prochlorococcus (cells/ml) Syn = Synechococcus (cells/ml) Piceu =
-Picoeukaryotes (cells/ml) Naneu = Nanoeukaryotes (cells/ml)</p>
-<p>Quality flags</p>
-<p>-999 = Missing or bad data 0 = Less than detection limit</p>
-<p>##Intro on BATS and ocean acidification</p>
+<p><strong>Variables and Units</strong></p>
+<ul>
+<li>yyyymmdd = Year Month Day<br />
+</li>
+<li>decy = Decimal Year<br />
+</li>
+<li>time = Time (hhmm)<br />
+</li>
+<li>latN = Latitude (Deg N)</li>
+<li>lonW = Longitude (Deg W)</li>
+<li>Depth = Depth (m)<br />
+</li>
+<li>Temp = Temperature ITS-90 (C)<br />
+</li>
+<li>CTD_S = CTD Salinity (PSS-78)<br />
+</li>
+<li>Sal1 = Salinity-1 (PSS-78)<br />
+</li>
+<li>Sig-th = Sigma-Theta (kg/m^3)<br />
+</li>
+<li>O2(1) = Oxygen-1 (umol/kg)<br />
+</li>
+<li>OxFixT = Oxygen Fix Temp (C)<br />
+</li>
+<li>Anom1 = Oxy Anomaly-1 (umol/kg)<br />
+</li>
+<li>CO2 = dissolved inorganic carbon (umol/kg)<br />
+</li>
+<li>Alk = Alkalinity (uequiv)<br />
+</li>
+<li>NO31 = Nitrate+Nitrite-1 (umol/kg)</li>
+<li>NO21 = Nitrite-1 (umol/kg)<br />
+</li>
+<li>PO41 = Phosphate-1 (umol/kg)<br />
+</li>
+<li>Si1 = Silicate-1 (umol/kg)<br />
+</li>
+<li>POC = POC (ug/kg)<br />
+</li>
+<li>PON = PON (ug/kg)<br />
+</li>
+<li>TOC = TOC (umol/kg)<br />
+</li>
+<li>TN = TN (umol/kg)<br />
+</li>
+<li>Bact = Bacteria enumeration (cells*10^8/kg)<br />
+</li>
+<li>POP = POP (umol/kg)</li>
+<li>TDP = Total dissolved Phosphorus (nmol/kg)</li>
+<li>SRP = Low-level phosphorus (nmol/kg)</li>
+<li>BSi = Particulate biogenic silica (umol/kg)</li>
+<li>LSi = Particulate lithogenic silica (umol/kg)</li>
+<li>Pro = Prochlorococcus (cells/ml)</li>
+<li>Syn = Synechococcus (cells/ml)</li>
+<li>Piceu = Picoeukaryotes (cells/ml)</li>
+<li>Naneu = Nanoeukaryotes (cells/ml)</li>
+</ul>
+<p><strong>Quality flags</strong></p>
+<ul>
+<li>-999 = Missing or bad data</li>
+<li>0 = Less than detection limit</li>
+</ul>
+<p><strong>Intro on BATS and ocean acidification</strong></p>
 <p>Here we will be using The Gibbs SeaWater (GSW) Oceanographic Toolbox
 of TEOS-10 to helps us quantify ocean acidification over the past 40
 years in the subtropical North Atlantic Ocean using BATS Time-series
 records. This with the intend to find different ways to predict changes
 going further into the future to help us understand what to expect in
 the future and analyze how this will affect the oceanic ecosystem.</p>
+<p>Ocean acidification due to climate change is changing the carbon
+cycle in the ocean. Trying to understand the metabolic processes on the
+ocean ecosystem and the variability between net ecosystem production and
+net ecosystem calcification… (expand on ocean acidification with
+references?)</p>
+<p><strong>Questions:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Is surface ocean pco2 increasing</li>
+</ol>
+<p><strong>Calculate CO2 chemistry parameter</strong></p>
+<p>We need to use the formula from ?carb;</p>
+<ul>
+<li>carb(flag, var1, var2, S=35, T=25, Patm=1, P=0, Pt=0, Sit=0,
+k1k2=“x”, kf=“x”, ks=“d”, pHscale=“T”, b=“u74”, gas=“potential”,
+warn=“y”, eos=“eos80”, long=1.e20, lat=1.e20)</li>
+</ul>
+<p>Using the data we have TA, DIC (CO2), S, T, Pt, Sit, but we don’t
+have pressure (dbar)</p>
+<p>Firts we need to calculate pressure using TEOS-10 with ?gsw and the
+formula p = gsw_p_from_z(z,lat)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>bats_co2<span class="ot">=</span>bats_bottle <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">P_dbar=</span><span class="fu">gsw_p_from_z</span>(Depth<span class="sc">*-</span><span class="dv">1</span>,latN))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#We used -1 cause is negative in the ocean</span></span></code></pre></div>
+<p>We now have all of the variables that we need to calculate the
+surface seawater chemistry at the BATS station, but we need to be
+careful about using the same units as the parameter of the seawater
+carbonate system.</p>
+<p>Now that we have TA, DIC, S, T, Pt, Sit, Pressure we need our BATS
+data units to be the same as the units used in the CO2sys.</p>
+<ul>
+<li>TA is in uequiv = umol/kg and we need mol/kg
+<ul>
+<li>Alk*10^-6</li>
+</ul></li>
+<li>DIC is in umol/ kg and we need mol/kg
+<ul>
+<li>DIC*10^-6</li>
+</ul></li>
+<li>S is in PSS and we will use Eos80
+<ul>
+<li>Sal1</li>
+</ul></li>
+<li>T is in degrees C and we need degree C
+<ul>
+<li>Temp</li>
+</ul></li>
+<li>Pt is in umol/kg and we need mol/kg
+<ul>
+<li>PO41*10^-6</li>
+</ul></li>
+<li>Sit is in umol/kg an we need mol/kg
+<ul>
+<li>Si1*10^-6</li>
+</ul></li>
+<li>P_dbar is in dbar and we need bar
+<ul>
+<li>P_dbar/10 or P_dbar*10^-1</li>
+</ul></li>
+</ul>
+<p>We will need to convert Units scaling when using CO2sys. We copy the
+code from ?carb. Since we have we have TA y DIC we should use flag = 15
+ALK and DIC.</p>
+<p><strong>Units scaling for CO2sys</strong></p>
 </section>
 
 
