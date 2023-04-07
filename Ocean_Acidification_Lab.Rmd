@@ -133,3 +133,5 @@ Now that we have TA, DIC, S, T, Pt, Sit, Pressure we need our BATS data units to
 We will need to convert Units scaling when using CO2sys. We copy the code from ?carb. Since we have we have TA y DIC we should use flag = 15 ALK and DIC. 
 
 **Units scaling for CO2sys**
+
+Yes terminar esto

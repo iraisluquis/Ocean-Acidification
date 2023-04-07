@@ -11,7 +11,7 @@ library('seacarb')
 library(ggplot2)
 library(plotly)
 
-###############################################################################Intro>methods>result>discussion mino-lab report
+###############################################################################Intro>methods>result>discussion mini-lab report
 #Import Data from BATS
 bats_bottle <- read_delim("bats_bottle.txt", 
                           delim = "\t", escape_double = FALSE, 
