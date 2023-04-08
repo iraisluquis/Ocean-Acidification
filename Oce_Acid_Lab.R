@@ -157,19 +157,29 @@ plot(bats_co2sys$DIC,test$TA)
 
 #filter for only the surface ocean
 bats_co2sys_surf = bats_co2sys %>%
-  filter(Depth<100) #we are selecting only the upper 100m
+  filter(Depth<100) %>%#we are selecting only the upper 100m
+  filter(pCO2insitu>100)
 view(bats_co2sys_surf)
 
 #1) Is surface ocean pco2 increasing
+#bats_co2sys_surf %>%
+#  ggplot(mapping = aes(x=decy, y=pCO2insitu)) +
+#  geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
+#  geom_smooth(method="lm") +
+#  scale_x_continuous(limits = c(1988,2021))+
+#  labs(x = "Years", y = "pCO2", title = "BATS Surface pCO2 vs years")+
+#  theme_classic()+
+#  theme(plot.title = element_text(hjust = 0.5))
+
 bats_co2sys_surf %>%
   ggplot(mapping = aes(x=decy, y=pCO2insitu)) +
   geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
   geom_smooth(method="lm") +
   scale_x_continuous(limits = c(1988,2021))+
   labs(x = "Years", y = "pCO2 (µatm)", title = "BATS Surface pCO2 vs years",
-       subtitle = "Data source: BATS")+
+       subtitle = "Data source: BATS.")+
   theme_classic()+
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5))
 
 
 
@@ -178,6 +188,10 @@ check=bats_co2sys_surf%>%
 
 pCO2_model = lm(pCO2insitu~decy, data=bats_co2sys_surf)
 summary(pCO2_model)
+anova(pCO2_model)
+
+#Cheking our model performance using the performance package 
+check_model(pCO2_model)
 
 #For homework
 #Make decy vs pco2 plot pretty

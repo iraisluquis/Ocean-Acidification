@@ -144,7 +144,7 @@ bats_co2sys=
 bats_co2sys_surf = bats_co2sys %>%
   filter(Depth<100) %>%
   filter(pCO2insitu>100)
-#Here it filters to a depth<100 selecting only the upper 100m meaning we are working in surface water. 
+#Here it filters to a depth<100 selecting only the upper 100m meaning we are working in surface water. And filter pCO2 to not include pCO2insitu>100
  
 ```
 
@@ -161,7 +161,23 @@ bats_co2sys_surf %>%
   labs(x = "Years", y = "pCO2 (µatm)", title = "BATS Surface pCO2 vs years",
        subtitle = "Data source: BATS.")+
   theme_classic()+
-  theme(plot.title = element_text(hjust = 0.5, size = 16))
+  theme(plot.title = element_text(hjust = 0.5))
+
+check=bats_co2sys_surf%>%
+  filter(pCO2<200) #Filter for only pCO2 less than 200
+
+pCO2_model = lm(pCO2insitu~decy, data=bats_co2sys_surf) 
+#Linear regression between surface pCO2 and the years 
 
 ```
+Checking model performance:
+```{r}
+#This is used to confirm assumptions about the model
+check_model(pCO2_model)
+
+#The summary is using ANOVA to produce the p-values. 
+summary(pCO2_model) #thesummary of the lineal regression 
+anova(pCO2_model) 
+```
+Checking model prediction:
 
