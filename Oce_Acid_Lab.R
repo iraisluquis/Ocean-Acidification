@@ -161,10 +161,17 @@ bats_co2sys_surf = bats_co2sys %>%
 view(bats_co2sys_surf)
 
 #1) Is surface ocean pco2 increasing
-bats_co2sys_surf%>%
-  ggplot(mapping = aes(x=decy,y=pCO2insitu))+
-  geom_point()+
-  geom_smooth()
+bats_co2sys_surf %>%
+  ggplot(mapping = aes(x=decy, y=pCO2insitu)) +
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
+  geom_smooth(method="lm") +
+  scale_x_continuous(limits = c(1988,2021))+
+  labs(x = "Years", y = "pCO2 (µatm)", title = "BATS Surface pCO2 vs years",
+       subtitle = "Data source: BATS")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+
+
 
 check=bats_co2sys_surf%>%
   filter(pCO2<200)
