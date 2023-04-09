@@ -7,13 +7,13 @@ output:
     theme: cayman
 ---
 
-Can we quantify ocean acidification in the subtropical North Atlantic Ocean?
-  
-  1) Is surface ocean pco2 increasing
-  2) Is surface ocean seawater ph decreasing? 
-  3) Is surface ocean seawater saturation state with respect to aragonite           decreasing? 
-  
-**Load Required library**
+**Introduction**
+
+As a result of climate change, ocean acidification is altering the ocean's carbon cycle.Increased CO2 absorption by the ocean is causing a significant decrease in seawater pH. [Doney et al. (2020)](https://www.annualreviews.org/doi/abs/10.1146/annurev.marine.010908.163834) Understanding the metabolic processes on the ocean ecosystem and the variability between net ecosystem production and net ecosystem calcification is key to understand how this changes will affect in the near future. [Meléndez et al. (2022)](https://aslopubs.onlinelibrary.wiley.com/doi/full/10.1002/lno.12009) 
+
+The Bermuda Institution of Ocean Science (BIOS) is a Bermuda-based research organization that has been collecting data for more than a century. Since its beginnings in 1988, the BATS program has continuously collected data on various oceanographic parameters. [BIOS](https://bios.edu)
+
+**Load Required Library**
 ```{r, message=FALSE}
 library(tidyverse)
 library(reader)
@@ -30,6 +30,17 @@ bats_bottle <- read_delim("bats_bottle.txt",
 colnames(bats_bottle)<- colnames(read_csv("bats_bottle.txt", 
                                           skip = 59))
 ```
+**Methods**
+
+Here we will be using The Gibbs SeaWater (GSW) Oceanographic Toolbox of TEOS-10 to helps us quantify ocean acidification over the past 30 years in the subtropical North Atlantic Ocean using BATS Time-series records. This with the intend to find different ways to predict changes going further into the future to help us understand what to expect in and analyze how this will affect the oceanic ecosystem. 
+
+Can we quantify ocean acidification in the subtropical North Atlantic Ocean?
+  
+  1) Is surface ocean pCO2 increasing
+  2) Is surface ocean seawater pH decreasing? 
+  3) Is surface ocean seawater saturation state with respect to aragonite           decreasing? 
+  
+Using the BATS data, we want to determine how these parameters (pCO2, pH, and aragonite) have change over time.
 
 **Variables and Units**
 
@@ -72,13 +83,7 @@ colnames(bats_bottle)<- colnames(read_csv("bats_bottle.txt",
 - -999 = Missing or bad data
 - 0 = Less than detection limit
 
-**Intro on BATS and ocean acidification**
-
-Ocean acidification due to climate change is changing the carbon cycle in the ocean. Trying to understand the metabolic processes on the ocean ecosystem and the variability between net ecosystem production and net ecosystem calcification...   (expand on ocean acidification with references?)
-
-Here we will be using The Gibbs SeaWater (GSW) Oceanographic Toolbox of TEOS-10 to helps us quantify ocean acidification over the past 40 years in the subtropical North Atlantic Ocean using BATS Time-series records. This with the intend to find different ways to predict changes going further into the future to help us understand what to expect in the future and analyze how this will affect the oceanic ecosystem. #could include methods text for co2sys in lab report
-
-**Calculate CO2 chemistry parameter**
+**Calculate CO2 Chemistry Parameter**
 
 We need to use the formula from ?carb;
 
@@ -86,7 +91,7 @@ We need to use the formula from ?carb;
     k1k2="x", kf="x", ks="d", pHscale="T", b="u74", gas="potential", 
     warn="y", eos="eos80", long=1.e20, lat=1.e20)
 
-Using the data we have TA, DIC (CO2), S, T, Pt, Sit, but we don't have pressure (dbar)
+Using the data we have TA, DIC (CO2), S, T, Pt, Sit, but we don't have pressure (dbar). 
 
 Firts we need to calculate pressure using TEOS-10 with ?gsw and the formula 
 p = gsw_p_from_z(z,lat)
@@ -139,7 +144,7 @@ bats_co2sys=
               k1k2="l", kf="pf", ks="d", pHscale="T", 
               b="u74", gas="potential", 
               warn="y", eos="eos80",long=360-lonW, lat=latN))
-#Create a new variable called bats_co2sys using the data of bats_co2 and use pipping to filter the missing or bad data of the variables. The variable DIC is converted to CO2 here using rename. And mutate of carb was use to calculate the co2sys parameters. 
+#Create a new variable called bats_co2sys using the data of bats_co2 and use pipping to filter the missing or bad data of the variables. The variable DIC is converted to CO2 here using rename. And mutate of carb was use to calculate the co2sys parameters. Using this we got the parameter that we need to answer the questions (pCO2, pH, and aragonite)
 
 bats_co2sys_surf = bats_co2sys %>%
   filter(Depth<100) %>%
