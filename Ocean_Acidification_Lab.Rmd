@@ -139,7 +139,7 @@ bats_co2sys=
               k1k2="l", kf="pf", ks="d", pHscale="T", 
               b="u74", gas="potential", 
               warn="y", eos="eos80",long=360-lonW, lat=latN))
-#Create a new variable called bats_co2sys using the data of bats_co2 and use pipping to filter the missing or bad data of the variables. The variable DIC is converted to CO2 here using rename. And mutate of carbs was use to calculate the co2sys parameters. 
+#Create a new variable called bats_co2sys using the data of bats_co2 and use pipping to filter the missing or bad data of the variables. The variable DIC is converted to CO2 here using rename. And mutate of carb was use to calculate the co2sys parameters. 
 
 bats_co2sys_surf = bats_co2sys %>%
   filter(Depth<100) %>%
@@ -158,7 +158,7 @@ bats_co2sys_surf %>%
   geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
   geom_smooth(method="lm") +
   scale_x_continuous(limits = c(1988,2021))+
-  labs(x = "Years", y = "pCO2 (µatm)", title = "BATS Surface pCO2 vs years",
+  labs(x = "Years", y = "pCO2", title = "BATS Surface pCO2 vs years",
        subtitle = "Data source: BATS.")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5))
@@ -176,7 +176,7 @@ Checking model performance:
 check_model(pCO2_model)
 
 #The summary is using ANOVA to produce the p-values. 
-summary(pCO2_model) #thesummary of the lineal regression 
+summary(pCO2_model) #the summary of the lineal regression 
 anova(pCO2_model) 
 ```
 Ploting model prediction:
@@ -206,13 +206,13 @@ bats_co2sys_surf_pred %>%
     theme(plot.title = element_text(hjust = 0.5))
 
 ```
-Discussion:
+Discussion 1:
 #ARREGLAR ESTA RESPUESTA
 #There is a seasonal cycle in surface ocean pCO2 at BATS with higher pCO2 observed in late summer to early fall and lower pCO2 observed in late winter and early spring. There is a a consistent, detectable (ANOVA, p<0.001) annual increase in pCO2 by 1.85+-0.07 uatm/year.
 #also show plot with model. The figure caption describes plot (points=data, line=model, shaded region = 95% confidence intervals.)
 
 2) Is surface ocean seawater pH decreasing? 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 bats_co2sys_surf %>%
   ggplot(mapping = aes(x=decy, y=pH)) +
   geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
@@ -222,5 +222,87 @@ bats_co2sys_surf %>%
        subtitle = "Data source: BATS.")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5))
+
+pH_model = lm(pH~decy, data=bats_co2sys_surf) 
+#Linear regression between surface pCO2 and the years 
 ```
 
+Checking model performance:
+```{r}
+#This is used to confirm assumptions about the model
+#check_model(pH_model)
+
+#The summary is using ANOVA to produce the p-values. 
+summary(pH_model) #the summary of the lineal regression 
+anova(pH_model) 
+```
+
+Ploting model prediction:
+We use this to confirm that our previews data is correct
+
+```{r, warning=FALSE}
+#Using R method
+bats_co2sys_surf_pred=
+  cbind(bats_co2sys_surf, predict(pH_model, interval = 'confidence',level=0.95))
+
+#Adding the prediction line to ggplot 
+bats_co2sys_surf_pred %>% 
+  ggplot(mapping=aes(x=decy,y=pH))+
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5)+
+  geom_line(aes(decy,fit),color="red")+
+  geom_ribbon(aes(x=decy,ymin=lwr,ymax=upr),alpha=0.2,fill="red")+
+  labs(x = "Years", y = "pCO2", title = "Prediction surface pH vs years",
+       subtitle = "Data source: BATS.")+
+  scale_x_continuous(limits = c(1988,2021))+
+  theme_classic()+
+    theme(plot.title = element_text(hjust = 0.5))
+```
+Discussion 2:
+
+3) Is surface ocean seawater saturation state with respect to aragonite decreasing?
+```{r,warning=FALSE, message=FALSE}
+bats_co2sys_surf %>%
+  ggplot(mapping = aes(x=decy, y=OmegaAragonite)) +
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
+  geom_smooth(method="lm") +
+  scale_x_continuous(limits = c(1988,2021))+
+  labs(x = "Years", y = "Ωar", title = "BATS Surface pH vs years",
+       subtitle = "Data source: BATS.")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5))
+
+OmegaAragonite_model = lm(pCO2insitu~decy, data=bats_co2sys_surf) 
+#Linear regression between surface pCO2 and the years 
+```
+
+Checking model performance:
+```{r}
+#This is used to confirm assumptions about the model
+#check_model(pH_model)
+
+#The summary is using ANOVA to produce the p-values. 
+summary(OmegaAragonite_model) #the summary of the lineal regression 
+anova(OmegaAragonite_model) 
+```
+Ploting model prediction:
+We use this to confirm that our previews data is correct
+
+```{r, warning=FALSE}
+#Using R method
+bats_co2sys_surf_pred=
+  cbind(bats_co2sys_surf, predict(OmegaAragonite_model, interval = 'confidence',level=0.95))
+
+#Adding the prediction line to ggplot 
+bats_co2sys_surf_pred %>% 
+  ggplot(mapping=aes(x=decy,y=OmegaAragonite))+
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5)+
+  geom_line(aes(decy,fit),color="red")+
+  geom_ribbon(aes(x=decy,ymin=lwr,ymax=upr),alpha=0.2,fill="red")+
+  labs(x = "Years", y = "Ωar", title = "Prediction OmegaAragonite vs years",
+       subtitle = "Data source: BATS.")+
+  scale_x_continuous(limits = c(1988,2021))+
+  theme_classic()+
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+Discussion 3:
