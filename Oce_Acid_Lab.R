@@ -190,17 +190,47 @@ pCO2_model = lm(pCO2insitu~decy, data=bats_co2sys_surf)
 summary(pCO2_model)
 anova(pCO2_model)
 
+#How do we check our model performance
+
 #Cheking our model performance using the performance package 
 check_model(pCO2_model)
 
-#For homework
-#Make decy vs pco2 plot pretty
-#could include methods text for co2sys in lab report
+# Also summary is using ANOVA to produce p-values
+summary(pCO2_model) #pvalue is same as anova
+anova(pCO2_model) #pvalue is same as summary
 
-#For Thursday:
-#How do we check our model performance
 #How do we plot our model predictions?
+?predict
+
+#the tidy way with dplyr but we need to rename outputs
+bats_co2sys_surf_pred=
+  bats_co2sys_surf %>% 
+  mutate(predict(pCO2_model,interval='confidence',level=0.95))
+
+#the base R way with cbind and do not need to rename outputs
+bats_co2sys_surf_pred=
+  cbind(bats_co2sys_surf, predict(pCO2_model, interval = 'confidence',level=0.95))
 
 
 #2) Is surface ocean seawater ph decreasing? 
+bats_co2sys_surf %>%
+  ggplot(mapping = aes(x=decy, y=pH)) +
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
+  geom_smooth(method="lm") +
+  scale_x_continuous(limits = c(1988,2021))+
+  labs(x = "Years", y = "pH", title = "BATS Surface pH vs years",
+       subtitle = "Data source: BATS.")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5))
+
 #3) Is surface ocean seawater saturation state with respect to aragonite decreasing?
+
+bats_co2sys_surf %>%
+  ggplot(mapping = aes(x=decy, y=pH)) +
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
+  geom_smooth(method="lm") +
+  scale_x_continuous(limits = c(1988,2021))+
+  labs(x = "Years", y = "pH", title = "BATS Surface pH vs years",
+       subtitle = "Data source: BATS.")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5))

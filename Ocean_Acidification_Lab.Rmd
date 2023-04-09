@@ -74,9 +74,9 @@ colnames(bats_bottle)<- colnames(read_csv("bats_bottle.txt",
 
 **Intro on BATS and ocean acidification**
 
-Here we will be using The Gibbs SeaWater (GSW) Oceanographic Toolbox of TEOS-10 to helps us quantify ocean acidification over the past 40 years in the subtropical North Atlantic Ocean using BATS Time-series records. This with the intend to find different ways to predict changes going further into the future to help us understand what to expect in the future and analyze how this will affect the oceanic ecosystem. 
-
 Ocean acidification due to climate change is changing the carbon cycle in the ocean. Trying to understand the metabolic processes on the ocean ecosystem and the variability between net ecosystem production and net ecosystem calcification...   (expand on ocean acidification with references?)
+
+Here we will be using The Gibbs SeaWater (GSW) Oceanographic Toolbox of TEOS-10 to helps us quantify ocean acidification over the past 40 years in the subtropical North Atlantic Ocean using BATS Time-series records. This with the intend to find different ways to predict changes going further into the future to help us understand what to expect in the future and analyze how this will affect the oceanic ecosystem. #could include methods text for co2sys in lab report
 
 **Calculate CO2 chemistry parameter**
 
@@ -179,5 +179,48 @@ check_model(pCO2_model)
 summary(pCO2_model) #thesummary of the lineal regression 
 anova(pCO2_model) 
 ```
-Checking model prediction:
+Ploting model prediction:
+
+We could use the tidy way with dplyr were the outputs will need to be rename   or the base R method were the outputs do not need to be rename. 
+  
+```{r, warning=FALSE}
+#We used ?predict
+
+bats_co2sys_surf_pred=
+  bats_co2sys_surf %>% 
+  mutate(predict(pCO2_model,interval='confidence',level=0.95))
+
+bats_co2sys_surf_pred=
+  cbind(bats_co2sys_surf, predict(pCO2_model, interval = 'confidence',level=0.95))
+
+#Adding the prediction line to ggplot 
+bats_co2sys_surf_pred %>% 
+  ggplot(mapping=aes(x=decy,y=pCO2insitu))+
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5)+
+  geom_line(aes(decy,fit),color="red")+
+  geom_ribbon(aes(x=decy,ymin=lwr,ymax=upr),alpha=0.2,fill="red")+
+  labs(x = "Years", y = "pCO2", title = "Prediction surface pCO2 vs years",
+       subtitle = "Data source: BATS.")+
+  scale_x_continuous(limits = c(1988,2021))+
+  theme_classic()+
+    theme(plot.title = element_text(hjust = 0.5))
+
+```
+Discussion:
+#ARREGLAR ESTA RESPUESTA
+#There is a seasonal cycle in surface ocean pCO2 at BATS with higher pCO2 observed in late summer to early fall and lower pCO2 observed in late winter and early spring. There is a a consistent, detectable (ANOVA, p<0.001) annual increase in pCO2 by 1.85+-0.07 uatm/year.
+#also show plot with model. The figure caption describes plot (points=data, line=model, shaded region = 95% confidence intervals.)
+
+2) Is surface ocean seawater pH decreasing? 
+```{r, warning=FALSE}
+bats_co2sys_surf %>%
+  ggplot(mapping = aes(x=decy, y=pH)) +
+  geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
+  geom_smooth(method="lm") +
+  scale_x_continuous(limits = c(1988,2021))+
+  labs(x = "Years", y = "pH", title = "BATS Surface pH vs years",
+       subtitle = "Data source: BATS.")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
