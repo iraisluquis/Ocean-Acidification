@@ -130,7 +130,7 @@ Now that we have TA, DIC, S, T, Pt, Sit, Pressure we need our BATS data units to
   
 We will need to convert Units scaling when using CO2sys. We copy the code from ?carb. Since we have we have TA y DIC we should use flag = 15 ALK and DIC. 
 
-**Units scaling for CO2sys**
+**Units Scaling for CO2sys**
 ```{r, warning=FALSE}
 bats_co2sys=
   bats_co2 %>% 
@@ -157,22 +157,31 @@ bats_co2sys_surf = bats_co2sys %>%
 
 1) Is surface ocean pco2 increasing
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, error=FALSE}
 bats_co2sys_surf %>%
   ggplot(mapping = aes(x=decy, y=pCO2insitu)) +
   geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
-  geom_smooth(method="lm") +
-  scale_x_continuous(limits = c(1988,2021))+
-  labs(x = "Years", y = "pCO2", title = "BATS Surface pCO2 vs years",
-       subtitle = "Data source: BATS.")+
-  theme_classic()+
-  theme(plot.title = element_text(hjust = 0.5))
+  geom_smooth(method="lm", size = 1.5, color = "#fbb4ae") +
+  scale_x_continuous(limits = c(1988,2021)) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) +
+  labs(x = "Years", y = "pCO2 (µatm)", title = "Surface pCO2 vs years",
+       subtitle = "Data source: BATS") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        plot.caption = element_text(size = 12)) +
+  theme(panel.grid.major = element_line(color = "#d9d9d9", linetype = "dashed"),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "#f0f0f0", color = NA)) +
+  labs(caption = "Figure 1. Surface pCO2 values at the BATS site from 1988 to 2021") 
+
 
 check=bats_co2sys_surf%>%
   filter(pCO2<200) #Filter for only pCO2 less than 200
 
 pCO2_model = lm(pCO2insitu~decy, data=bats_co2sys_surf) 
-#Linear regression between surface pCO2 and the years 
+#Linear regression between surface pCO2 and the years to determine if it is increasing or decreasing
 
 ```
 Checking model performance:
@@ -180,7 +189,7 @@ Checking model performance:
 #This is used to confirm assumptions about the model
 check_model(pCO2_model)
 
-#The summary is using ANOVA to produce the p-values. 
+#The summary is using ANOVA to produce the p-values. (p-values are the same) 
 summary(pCO2_model) #the summary of the lineal regression 
 anova(pCO2_model) 
 ```
@@ -204,17 +213,18 @@ bats_co2sys_surf_pred %>%
   geom_point(color = "#5e3c99", size = 3, alpha = 0.5)+
   geom_line(aes(decy,fit),color="red")+
   geom_ribbon(aes(x=decy,ymin=lwr,ymax=upr),alpha=0.2,fill="red")+
-  labs(x = "Years", y = "pCO2", title = "Prediction surface pCO2 vs years",
+  labs(x = "Years", y = "pCO2 (µatm)", title = "Prediction surface pCO2 vs years",
        subtitle = "Data source: BATS.")+
   scale_x_continuous(limits = c(1988,2021))+
   theme_classic()+
     theme(plot.title = element_text(hjust = 0.5))
 
 ```
-Discussion 1:
-#ARREGLAR ESTA RESPUESTA
-#There is a seasonal cycle in surface ocean pCO2 at BATS with higher pCO2 observed in late summer to early fall and lower pCO2 observed in late winter and early spring. There is a a consistent, detectable (ANOVA, p<0.001) annual increase in pCO2 by 1.85+-0.07 uatm/year.
-#also show plot with model. The figure caption describes plot (points=data, line=model, shaded region = 95% confidence intervals.)
+**Discussion 1:**
+
+The model interpretation shows that pCO2 does increase with time. There is a a consistent, detectable (ANOVA, p<0.001) annual increase in pCO2 by 1.86+-0.00 µatm/year. This could be attributed to the changes between seasons in surface ocean pCO2 at BATS with higher pCO2 observed in late summer to early fall and lower pCO2 observed in late winter and early spring. 
+
+Figure 1: The points represent de data of pCO2 from 1988 to 2021, the line would be the pCO2 model and the thickness of the line covers the confidence interval of 95%
 
 2) Is surface ocean seawater pH decreasing? 
 ```{r, warning=FALSE, message=FALSE}
@@ -261,8 +271,10 @@ bats_co2sys_surf_pred %>%
   scale_x_continuous(limits = c(1988,2021))+
   theme_classic()+
     theme(plot.title = element_text(hjust = 0.5))
+
+
 ```
-Discussion 2:
+**Discussion 2:**
 
 3) Is surface ocean seawater saturation state with respect to aragonite decreasing?
 ```{r,warning=FALSE, message=FALSE}
@@ -271,7 +283,7 @@ bats_co2sys_surf %>%
   geom_point(color = "#5e3c99", size = 3, alpha = 0.5) +
   geom_smooth(method="lm") +
   scale_x_continuous(limits = c(1988,2021))+
-  labs(x = "Years", y = "Ωar", title = "BATS Surface pH vs years",
+  labs(x = "Years", y = "Ωar", title = "BATS Surface OmegaAragonite vs years",
        subtitle = "Data source: BATS.")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5))
@@ -303,11 +315,12 @@ bats_co2sys_surf_pred %>%
   geom_point(color = "#5e3c99", size = 3, alpha = 0.5)+
   geom_line(aes(decy,fit),color="red")+
   geom_ribbon(aes(x=decy,ymin=lwr,ymax=upr),alpha=0.2,fill="red")+
-  labs(x = "Years", y = "Ωar", title = "Prediction OmegaAragonite vs years",
-       subtitle = "Data source: BATS.")+
+  labs(x = "Years", y = "pCO2", title = "Prediction surface OmegaAragonite vs years",
+       subtitle = "Data source: BATS")+
   scale_x_continuous(limits = c(1988,2021))+
   theme_classic()+
     theme(plot.title = element_text(hjust = 0.5))
+
 ```
 
-Discussion 3:
+**Discussion 3:**
